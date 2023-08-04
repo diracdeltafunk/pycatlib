@@ -21,21 +21,6 @@ span = Category(
 )
 cospan = span.op()
 
-# the group S3
-s3 = Category(
-    objects=[0],
-    morphisms=list(permutations(range(3), 3)),
-    domain={f: 0 for f in permutations(range(3), 3)},
-    codomain={f: 0 for f in permutations(range(3), 3)},
-    id={0: (0, 1, 2)},
-    composition={
-        (f, g): (f[g[0]], f[g[1]], f[g[2]])
-        for f in permutations(range(3), 3)
-        for g in permutations(range(3), 3)
-    },
-)
-s3_op = s3.op()
-
 
 def test_span():
     # is not initial
@@ -76,6 +61,22 @@ def test_span():
     assert not cospan.is_finitely_complete()
 
 
+# the group S3
+s3 = Category(
+    objects=[0],
+    morphisms=list(permutations(range(3), 3)),
+    domain={f: 0 for f in permutations(range(3), 3)},
+    codomain={f: 0 for f in permutations(range(3), 3)},
+    id={0: (0, 1, 2)},
+    composition={
+        (f, g): (f[g[0]], f[g[1]], f[g[2]])
+        for f in permutations(range(3), 3)
+        for g in permutations(range(3), 3)
+    },
+)
+s3_op = s3.op()
+
+
 def test_s3():
     # is not initial
     assert len(s3.morphisms) != 0
@@ -113,3 +114,44 @@ def test_s3():
     assert not s3.is_finitely_complete()
     # is not cocomplete
     assert not s3_op.is_finitely_complete()
+
+
+# ordinal categories
+def ordinal(n):
+    return Category(
+        objects=list(range(n)),
+        morphisms=[(i, j) for i in range(n) for j in range(n) if i <= j],
+        domain={(i, j): i for i in range(n) for j in range(n) if i <= j},
+        codomain={(i, j): j for i in range(n) for j in range(n) if i <= j},
+        id={i: (i, i) for i in range(n)},
+        composition={
+            ((j, k), (i, j)): (i, k)
+            for i in range(n)
+            for j in range(n)
+            for k in range(n)
+            if i <= j <= k
+        },
+    )
+
+
+def test_ordinal():
+    for n in range(6):
+        ord = ordinal(n)
+        # is discrete iff n≤1
+        assert ord.is_discrete() == (n <= 1)
+        # has terminal object iff n≥1
+        assert ord.has_terminal_object() == (n >= 1)
+        # is preorder
+        assert ord.is_preorder()
+        # is skeletal
+        assert ord.is_skeletal()
+        # is connected iff n≥1
+        assert ord.is_connected() == (n >= 1)
+        # has equalizers
+        assert ord.has_equalizers()
+        # has binary products
+        assert ord.has_binary_products()
+        # has finite products iff n≥1
+        assert ord.has_finite_products() == (n >= 1)
+        # is complete iff n≥1
+        assert ord.is_finitely_complete() == (n >= 1)
