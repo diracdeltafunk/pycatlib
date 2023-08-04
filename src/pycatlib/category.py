@@ -256,7 +256,7 @@ def compute_num_objs(mat: list) -> int:
     return objs
 
 
-def from_minion_matrix(mat: list, objs: int | None = None) -> Category:
+def from_minion_matrix(mat: list, objs = None) -> Category:
     morphs = len(mat)
     if objs is None:
         objs = compute_num_objs(mat)
