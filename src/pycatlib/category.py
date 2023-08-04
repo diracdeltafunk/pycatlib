@@ -178,16 +178,18 @@ class Category:
         if len(self.objects) == 0:
             self.cache["is_connected"] = False
             return False
-        unseen = set(self.objects)
-        queue = {self.objects[0]}
+        visited = [self.objects[0]]
+        queue = [self.objects[0]]
         while len(queue) > 0:
-            current = queue.pop()
-            unseen.discard(current)
-            for x in unseen:
-                for f in self.morphisms:
-                    if (self.dom(f), self.cod(f)) in [(x, current), (current, x)]:
-                        queue.add(x)
-        self.cache["is_connected"] = len(unseen) == 0
+            current = queue.pop(0)
+            for f in self.morphisms:
+                if self.dom(f) == current and self.cod(f) not in visited:
+                    visited.append(self.cod(f))
+                    queue.append(self.cod(f))
+                elif self.cod(f) == current and self.dom(f) not in visited:
+                    visited.append(self.dom(f))
+                    queue.append(self.dom(f))
+        self.cache["is_connected"] = len(visited) == len(self.objects)
         return self.cache["is_connected"]
 
     def is_groupoid(self):
