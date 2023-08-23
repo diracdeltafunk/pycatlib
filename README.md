@@ -4,4 +4,4 @@ A small library for computing with finite categories. Made for use with the [Sma
 
 ## WARNING
 
-This is really bad code. I just wrote this to do some quicky and dirty computations.
+This is really bad code, and there is no documentation! I just wrote this to do some quicky and dirty computations in order to populate the database for [smallcats.info](https://smallcats.info).
