@@ -67,7 +67,7 @@ class Category:
         return self.dom(f) == self.cod(f)
 
     def is_iso(self, f):
-        for g in self.hom(self.codomain.get(f), self.domain.get(f)):
+        for g in self.hom(self.cod(f), self.dom(f)):
             if self.comp(f, g) == self.i(self.cod(f)) and self.comp(g, f) == self.i(
                 self.dom(f)
             ):
@@ -198,6 +198,28 @@ class Category:
         self.cache["is_groupoid"] = all(self.is_iso(f) for f in self.morphisms)
         return self.cache["is_groupoid"]
 
+    # Assumes m is idempotent!!
+    def idempotent_is_split(self, m):
+        x = self.dom(m)
+        for o in self.objects:
+            for f in self.hom(o, x):
+                for g in self.hom(x, o):
+                    if self.comp(g, f) == self.i(o) and self.comp(f, g) == m:
+                        return True
+        return False
+
+    def is_idempotent_complete(self):
+        if "is_idempotent_complete" in self.cache:
+            return self.cache["is_idempotent_complete"]
+        for m in self.morphisms:
+            if self.comp(m, m) != m:
+                continue
+            if not self.idempotent_is_split(m):
+                self.cache["is_idempotent_complete"] = False
+                return False
+        self.cache["is_idempotent_complete"] = True
+        return True
+
     def op(self):
         return Category(
             objects=self.objects.copy(),
@@ -256,7 +278,7 @@ def compute_num_objs(mat: list) -> int:
     return objs
 
 
-def from_minion_matrix(mat: list, objs = None) -> Category:
+def from_minion_matrix(mat: list, objs=None) -> Category:
     morphs = len(mat)
     if objs is None:
         objs = compute_num_objs(mat)
